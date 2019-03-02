@@ -28,7 +28,6 @@ podTemplate(
             )
     ],
     volumes: [
-      persistentVolumeClaim(mountPath: '/home/maven/.m2', claimName: 'jenkins-maven'),
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
       secretVolume(secretName: 'docker-config', mountPath: '/root/.docker'),
       secretVolume(secretName: 'kube-config', mountPath: '/root/.kube')
@@ -37,6 +36,14 @@ podTemplate(
 
 {
     node(label){
+
+        sh "git rev-parse --short HEAD > commit-id"
+
+        tag = readFile('commit-id').replace("\n", "").replace("\r", "")
+        appName = "hello-nginx"
+        registryHost = "registry.techlead-top.ovh"
+
+        imageName = "${registryHost}/${appName}:${tag}"
         
         stage('Git clone'){
            container('jnlp'){
@@ -46,19 +53,19 @@ podTemplate(
         
         stage('Build Docker image'){
             container('docker'){
-                sh label: 'Docker build', script: 'docker build -t registry.techlead-top.ovh/hello-nginx:jenkins-v3 .'
+                sh 'docker build -t ${imageName} .'
             }
         }
         
         stage('Push to private registry'){
             container('docker'){
-                sh 'docker push registry.techlead-top.ovh/hello-nginx:jenkins-v3'
+                sh 'docker push ${imageName}'
             }
         }
 
         stage('Deploy with Kubernetes'){
             container('kubectl'){
-                sh 'kubectl apply -n demo-pic -f k8s-deployment.yaml'
+                sh 'kubectl apply -n demo-pic -f k8s-deployment.yaml --image=${imageName}'
             }
         }
             
