@@ -40,7 +40,7 @@ podTemplate(
             )
     ],
     volumes: [
-      persistentVolumeClaim(mountPath: '/home/maven/.m2', claimName: 'jenkins-maven')
+      persistentVolumeClaim(mountPath: '/home/maven/.m2', claimName: 'jenkins-maven'),
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
       secretVolume(secretName: 'docker-config', mountPath: '/root/.docker'),
       secretVolume(secretName: 'kube-config', mountPath: '/root/.kube')
