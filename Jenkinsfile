@@ -46,7 +46,7 @@ podTemplate(
         
         stage('Build Docker image'){
             container('docker'){
-                sh label: 'Docker build', script: 'docker build -t registry.techlead-top.ovh/hello-nginx:jenkins-v1 .'
+                sh label: 'Docker build', script: 'docker build -t registry.techlead-top.ovh/hello-nginx:jenkins-v2 .'
             }
         }
         
