@@ -37,19 +37,19 @@ podTemplate(
 {
     node(label){
 
-        sh "git rev-parse --short HEAD > commit-id"
-
-        tag = readFile('commit-id').replace("\n", "").replace("\r", "")
         appName = "hello-nginx"
         registryHost = "registry.techlead-top.ovh"
 
-        imageName = "${registryHost}/${appName}:${tag}"
-        
         stage('Git clone'){
            container('jnlp'){
                 git branch: 'master', url: 'https://github.com/seblaporte/hello-nginx.git'
+
+                sh "git rev-parse --short HEAD > commit-id"
+                tag = readFile('commit-id').replace("\n", "").replace("\r", "")
            }
         }
+
+        imageName = "${registryHost}/${appName}:${tag}"
         
         stage('Build Docker image'){
             container('docker'){
