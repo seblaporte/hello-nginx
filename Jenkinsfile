@@ -46,19 +46,19 @@ podTemplate(
         
         stage('Build Docker image'){
             container('docker'){
-                sh label: 'Docker build', script: 'docker build -t registry.techlead-top.ovh/hello-nginx:jenkins-v2 .'
+                sh label: 'Docker build', script: 'docker build -t registry.techlead-top.ovh/hello-nginx:jenkins-v3 .'
             }
         }
         
         stage('Push to private registry'){
             container('docker'){
-                sh 'docker push registry.techlead-top.ovh/hello-nginx:jenkins-v2'
+                sh 'docker push registry.techlead-top.ovh/hello-nginx:jenkins-v3'
             }
         }
 
         stage('Deploy with Kubernetes'){
             container('kubectl'){
-                sh 'kubectl -n demo-pic get pods'
+                sh 'kubectl apply -n demo-pic -f k8s-deployment.yaml'
             }
         }
             
