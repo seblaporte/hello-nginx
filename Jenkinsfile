@@ -6,21 +6,13 @@ podTemplate(
         containerTemplate(
                 name: 'jnlp',
                 image: 'jenkins/jnlp-slave:3.10-1',
-                args: '${computer.jnlpmac} ${computer.name}',
-                resourceRequestCpu: '50m',
-                resourceLimitCpu: '100m',
-                resourceRequestMemory: '100Mi',
-                resourceLimitMemory: '200Mi'
+                args: '${computer.jnlpmac} ${computer.name}'
             ),
         containerTemplate(
                 name: 'docker',
                 image: 'docker:stable',
                 command:'cat',
                 ttyEnabled:true,
-                resourceRequestCpu: '50m',
-                resourceLimitCpu: '100m',
-                resourceRequestMemory: '100Mi',
-                resourceLimitMemory: '200Mi',
                 envVars: [
                     envVar(key: 'DOCKER_CONFIG', value: '/root/.docker')
                 ]
@@ -30,10 +22,6 @@ podTemplate(
                 image: 'dtzar/helm-kubectl:2.13.0',
                 command:'cat',
                 ttyEnabled:true,
-                resourceRequestCpu: '50m',
-                resourceLimitCpu: '100m',
-                resourceRequestMemory: '100Mi',
-                resourceLimitMemory: '200Mi',
                 envVars: [
                     envVar(key: 'KUBECONFIG', value: '/root/.kube/config')
                 ]
