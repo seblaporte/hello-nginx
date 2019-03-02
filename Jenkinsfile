@@ -6,7 +6,7 @@ podTemplate(
         containerTemplate(
                 name: 'jnlp',
                 image: 'jenkins/jnlp-slave:3.10-1',
-                args: '${computer.jnlpmac} ${computer.name}'
+                args: '${computer.jnlpmac} ${computer.name}',
                 resourceRequestCpu: '50m',
                 resourceLimitCpu: '100m',
                 resourceRequestMemory: '100Mi',
