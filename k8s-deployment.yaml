@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: hello-nginx
-        image: registry.techlead-top.ovh/hello-nginx:jenkins-v3
+        image: IMAGE
         imagePullPolicy: Always
         ports:
           - name: web

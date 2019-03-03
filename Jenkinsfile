@@ -46,22 +46,27 @@ podTemplate(
                 sh "git rev-parse --short HEAD > /share/buildVersion"
            }
         }
+
+        stage('Create image name'){
+            sh 'echo "`cat /config/registryHost`/`cat /config/applicationName`:`cat /share/buildVersion`" > /share/imageName'
+            sh 'sed -ie "s/IMAGE/`cat /share/imageName`/g" k8s-deployment.yaml'
+        }
         
         stage('Build Docker image'){
             container('docker'){
-                sh 'docker build -t `cat /config/registryHost`/`cat /config/applicationName`:`cat /share/buildVersion)` .'
+                sh 'docker build -t `cat /share/imageName` .'
             }
         }
         
         stage('Push to private registry'){
             container('docker'){
-                sh 'docker push `cat /config/registryHost`/`cat /config/applicationName`:`cat /share/buildVersion)`'
+                sh 'docker push `cat /share/imageName`'
             }
         }
 
         stage('Deploy with Kubernetes'){
             container('kubectl'){
-                sh 'kubectl apply -n demo-pic -f k8s-deployment.yaml --image=`cat /config/registryHost`/`cat /config/applicationName`:`cat /share/buildVersion)`'
+                sh 'kubectl apply -n demo-pic -f k8s-deployment.yaml'
             }
         }
             
