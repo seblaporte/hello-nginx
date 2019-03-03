@@ -42,16 +42,17 @@ podTemplate(
         stage('Git clone'){
            container('jnlp'){
                 git branch: 'master', url: 'https://github.com/seblaporte/hello-nginx.git'
-
-                sh "git rev-parse --short HEAD > /share/buildVersion"
            }
         }
 
         stage('Create image name'){
-            sh  '''
+            container('jnlp'){
+                sh  '''
+                git rev-parse --short HEAD > /share/buildVersion
                 echo "`cat /config/registryHost`/`cat /config/applicationName`:`cat /share/buildVersion`" > /share/imageName
-                sed s@IMAGE@`cat /share/imageName`@g k8s-deployment.yaml > k8s-deployment.yaml
+                sed -ie s@IMAGE@`cat /share/imageName`@g k8s-deployment.yaml
                 '''
+            }
         }
         
         stage('Build Docker image'){
