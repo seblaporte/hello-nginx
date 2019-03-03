@@ -28,44 +28,40 @@ podTemplate(
             )
     ],
     volumes: [
-      hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-      secretVolume(secretName: 'docker-config', mountPath: '/root/.docker'),
-      secretVolume(secretName: 'kube-config', mountPath: '/root/.kube')
+        hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
+        secretVolume(secretName: 'docker-config', mountPath: '/root/.docker'),
+        secretVolume(secretName: 'kube-config', mountPath: '/root/.kube'),
+        persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-slave-share'),
+        configMapVolume(mountPath: '/config', configMapName: 'hello-nginx-job-config')
     ]
 )
 
 {
     node(label){
 
-        appName = "hello-nginx"
-        registryHost = "registry.techlead-top.ovh"
-
         stage('Git clone'){
            container('jnlp'){
                 git branch: 'master', url: 'https://github.com/seblaporte/hello-nginx.git'
 
-                sh "git rev-parse --short HEAD > commit-id"
-                tag = readFile('commit-id').replace("\n", "").replace("\r", "")
+                sh "git rev-parse --short HEAD > /share/buildVersion"
            }
         }
-
-        imageName = "${registryHost}/${appName}:${tag}"
         
         stage('Build Docker image'){
             container('docker'){
-                sh 'docker build -t ${imageName} .'
+                sh 'docker build -t `cat /config/registryHost`/`cat /config/applicationName`:`cat /share/buildVersion)` .'
             }
         }
         
         stage('Push to private registry'){
             container('docker'){
-                sh 'docker push ${imageName}'
+                sh 'docker push `cat /config/registryHost`/`cat /config/applicationName`:`cat /share/buildVersion)`'
             }
         }
 
         stage('Deploy with Kubernetes'){
             container('kubectl'){
-                sh 'kubectl apply -n demo-pic -f k8s-deployment.yaml --image=${imageName}'
+                sh 'kubectl apply -n demo-pic -f k8s-deployment.yaml --image=`cat /config/registryHost`/`cat /config/applicationName`:`cat /share/buildVersion)`'
             }
         }
             
