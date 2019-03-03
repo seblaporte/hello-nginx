@@ -48,8 +48,10 @@ podTemplate(
         }
 
         stage('Create image name'){
-            sh 'echo "`cat /config/registryHost`/`cat /config/applicationName`:`cat /share/buildVersion`" > /share/imageName'
-            sh 'sed -ie "s/IMAGE/`cat /share/imageName`/g" k8s-deployment.yaml'
+            sh  '''
+                echo "`cat /config/registryHost`/`cat /config/applicationName`:`cat /share/buildVersion`" > /share/imageName
+                sed -ie 's/IMAGE/`cat /share/imageName`/g' k8s-deployment.yaml
+                '''
         }
         
         stage('Build Docker image'){
