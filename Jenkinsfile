@@ -31,7 +31,7 @@ podTemplate(
         hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
         secretVolume(secretName: 'docker-config', mountPath: '/root/.docker'),
         secretVolume(secretName: 'kube-config', mountPath: '/root/.kube'),
-        persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-slave-share'),
+        persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-hello-nginx-share'),
         configMapVolume(mountPath: '/config', configMapName: 'hello-nginx-job-config')
     ]
 )
