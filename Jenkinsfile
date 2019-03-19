@@ -15,7 +15,27 @@ podTemplate(
         persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-slave-share'),
         configMapVolume(mountPath: '/config', configMapName: 'job-jenkins-config')
     ]
-)
+) {
+    node() {
+
+        stage('Git clone') {
+            container('jnlp') {
+                git branch: 'ludo', url: 'https://github.com/seblaporte/hello-nginx.git'
+            }
+        }
+
+        stage('Create image name') {
+            container('jnlp') {
+                sh '''
+                git rev-parse --short HEAD > /share/buildVersion
+                git config --local remote.origin.url|sed -n 's#.*/\\([^.]*\\)\\.git#\\1#p' > /share/applicationName
+                echo "`cat /config/registryHost`/`cat /share/applicationName`:`cat /share/buildVersion`" > /share/imageName
+                sed -ie s@IMAGE@`cat /share/imageName`@g k8s-deployment.yaml
+                '''
+            }
+        }
+    }
+}
 podTemplate(
     label: dockerlabel,
     containers: [
@@ -35,6 +55,22 @@ podTemplate(
         persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-slave-share'),
     ]
 )
+        {
+            node(){
+                stage('Build Docker image'){
+                    container('docker'){
+                        sh 'docker build -t `cat /share/imageName` .'
+                    }
+                }
+
+                stage('Push to private registry'){
+                    container('docker'){
+                        sh 'docker push `cat /share/imageName`'
+                    }
+                }
+            }
+
+        }
 podTemplate(
     label: kubelabel,
     containers: [
@@ -54,38 +90,8 @@ podTemplate(
         persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-slave-share'),
     ]
 )
-
 {
     node(){
-
-        stage('Git clone'){
-           container('jnlp'){
-                git branch: 'ludo', url: 'https://github.com/seblaporte/hello-nginx.git'
-           }
-        }
-
-        stage('Create image name'){
-            container('jnlp'){
-                sh  '''
-                git rev-parse --short HEAD > /share/buildVersion
-                git config --local remote.origin.url|sed -n 's#.*/\\([^.]*\\)\\.git#\\1#p' > /share/applicationName
-                echo "`cat /config/registryHost`/`cat /share/applicationName`:`cat /share/buildVersion`" > /share/imageName
-                sed -ie s@IMAGE@`cat /share/imageName`@g k8s-deployment.yaml
-                '''
-            }
-        }
-        
-        stage('Build Docker image'){
-            container('docker'){
-                sh 'docker build -t `cat /share/imageName` .'
-            }
-        }
-        
-        stage('Push to private registry'){
-            container('docker'){
-                sh 'docker push `cat /share/imageName`'
-            }
-        }
 
         stage('Deploy with Kubernetes'){
             container('kubectl'){
