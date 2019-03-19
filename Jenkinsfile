@@ -56,7 +56,7 @@ podTemplate(
 )
 
 {
-    node(label){
+    node(){
 
         stage('Git clone'){
            container('jnlp'){
