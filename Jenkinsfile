@@ -1,13 +1,24 @@
-def label = "demo-pic-worker-${UUID.randomUUID().toString()}"
+def jnlplabel = "jenkins-jnlp-${UUID.randomUUID().toString()}"
+def dockerlabel = "jenkins-docker-${UUID.randomUUID().toString()}"
+def kubelabel = "jenkins-kube-${UUID.randomUUID().toString()}"
 
 podTemplate(
-    label: label,
+    label: labeljnlp,
     containers: [
         containerTemplate(
                 name: 'jnlp',
                 image: 'jenkins/jnlp-slave:3.10-1',
                 args: '${computer.jnlpmac} ${computer.name}'
-            ),
+            )
+    ],
+    volumes: [
+        persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-slave-share'),
+        configMapVolume(mountPath: '/config', configMapName: 'job-jenkins-config')
+    ]
+)
+podTemplate(
+    label: labeldocker,
+    containers: [
         containerTemplate(
                 name: 'docker',
                 image: 'docker:stable',
@@ -16,7 +27,17 @@ podTemplate(
                 envVars: [
                     envVar(key: 'DOCKER_CONFIG', value: '/root/.docker')
                 ]
-            ),
+            )
+    ],
+    volumes: [
+        hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
+        secretVolume(secretName: 'docker-config', mountPath: '/root/.docker'),
+        persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-slave-share'),
+    ]
+)
+podTemplate(
+    label: labelkube,
+    containers: [
         containerTemplate(
                 name: 'kubectl',
                 image: 'dtzar/helm-kubectl:2.13.0',
@@ -29,10 +50,8 @@ podTemplate(
     ],
     volumes: [
         hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-        secretVolume(secretName: 'docker-config', mountPath: '/root/.docker'),
         secretVolume(secretName: 'kube-config', mountPath: '/root/.kube'),
         persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-slave-share'),
-        configMapVolume(mountPath: '/config', configMapName: 'job-jenkins-config')
     ]
 )
 
