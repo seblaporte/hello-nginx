@@ -20,18 +20,22 @@ podTemplate(
 
         stage('Git clone') {
             container('jnlp') {
-                git branch: 'ludo', url: 'https://github.com/seblaporte/hello-nginx.git'
+                dir('share') {
+                    git branch: 'ludo', url: 'https://github.com/seblaporte/hello-nginx.git'
+                }
             }
         }
 
         stage('Create image name') {
             container('jnlp') {
-                sh '''
-                git rev-parse --short HEAD > /share/buildVersion
-                git config --local remote.origin.url|sed -n 's#.*/\\([^.]*\\)\\.git#\\1#p' > /share/applicationName
-                echo "`cat /config/registryHost`/`cat /share/applicationName`:`cat /share/buildVersion`" > /share/imageName
-                sed -ie s@IMAGE@`cat /share/imageName`@g k8s-deployment.yaml
-                '''
+                dir('share') {
+                    sh '''
+                        git rev-parse --short HEAD > /share/buildVersion
+                        git config --local remote.origin.url|sed -n 's#.*/\\([^.]*\\)\\.git#\\1#p' > /share/applicationName
+                        echo "`cat /config/registryHost`/`cat /share/applicationName`:`cat /share/buildVersion`" > /share/imageName
+                        sed -ie s@IMAGE@`cat /share/imageName`@g k8s-deployment.yaml
+                    '''
+                }
             }
         }
     }
