@@ -16,7 +16,7 @@ podTemplate(
         configMapVolume(mountPath: '/config', configMapName: 'job-jenkins-config')
     ]
 ) {
-    node() {
+    node(jnlplabel) {
 
         stage('Git clone') {
             container('jnlp') {
@@ -56,7 +56,7 @@ podTemplate(
     ]
 )
         {
-            node(){
+            node(dockerlabel){
                 stage('Build Docker image'){
                     container('docker'){
                         sh 'docker build -t `cat /share/imageName` .'
@@ -91,7 +91,7 @@ podTemplate(
     ]
 )
 {
-    node(){
+    node(kubelabel){
 
         stage('Deploy with Kubernetes'){
             container('kubectl'){
