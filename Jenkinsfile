@@ -49,7 +49,7 @@ podTemplate(
             container('jnlp'){
                 sh  '''
                 git rev-parse --short HEAD > /share/buildVersion
-                echo "`cat /config/registryHost`/`cat /config/applicationName`:`cat /share/buildVersion`" > /share/imageName
+                git config --local remote.origin.url|sed -n 's#.*/\\\\([^.]*\\\\)\\\\.git#\\\\1#p' > /share/applicationName
                 sed -ie s@IMAGE@`cat /share/imageName`@g k8s-deployment.yaml
                 '''
             }
