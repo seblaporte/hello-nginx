@@ -3,7 +3,7 @@ def dockerlabel = "jenkins-docker-${UUID.randomUUID().toString()}"
 def kubelabel = "jenkins-kube-${UUID.randomUUID().toString()}"
 
 podTemplate(
-    label: labeljnlp,
+    label: jnlplabel,
     containers: [
         containerTemplate(
                 name: 'jnlp',
@@ -17,7 +17,7 @@ podTemplate(
     ]
 )
 podTemplate(
-    label: labeldocker,
+    label: dockerlabel,
     containers: [
         containerTemplate(
                 name: 'docker',
@@ -36,7 +36,7 @@ podTemplate(
     ]
 )
 podTemplate(
-    label: labelkube,
+    label: kubelabel,
     containers: [
         containerTemplate(
                 name: 'kubectl',
