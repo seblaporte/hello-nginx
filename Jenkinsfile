@@ -41,7 +41,7 @@ podTemplate(
 
         stage('Git clone'){
            container('jnlp'){
-                git branch: 'master', url: 'https://github.com/seblaporte/hello-nginx.git'
+                git branch: 'ludo', url: 'https://github.com/seblaporte/hello-nginx.git'
            }
         }
 
