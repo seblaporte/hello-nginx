@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: hello-nginx
-        image: hello-nginx:latest
+        image: registry.demo-pic.techlead-top.ovh/hello-nginx:latest
         imagePullPolicy: Always
         ports:
           - name: web
