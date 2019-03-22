@@ -55,9 +55,11 @@ podTemplate(
         
         stage('Build Docker image and push to private registry'){
             container(name: 'kaniko', shell: '/busybox/sh') {
+                withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
                 sh '''
                 /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=registry.demo-pic.techlead-top.ovh/myorg/myimage
                 '''
+                }
             }
         }
 
