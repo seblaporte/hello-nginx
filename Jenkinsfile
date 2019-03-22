@@ -1,6 +1,7 @@
 def label = "jenkins-worker-${UUID.randomUUID().toString()}"
+def podTemplate = readFile "k8s-jenkins-pod.yaml"
 
-podTemplate(name: 'jenkins-slave', label: label, yaml: readFile("k8s-jenkins-pod.yaml"))
+podTemplate(name: 'jenkins-slave', label: label, yaml: podTemplate)
 {
     node(label){
 
