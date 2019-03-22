@@ -10,8 +10,8 @@ podTemplate(
             ),
         containerTemplate(
                 name: 'kaniko',
-                image: 'gcr.io/kaniko-project/executor:latest',
-                command:'cat',
+                image: 'gcr.io/kaniko-project/executor:debug',
+                command:'/busybox/catt',
                 ttyEnabled:true,
             ),
         containerTemplate(
