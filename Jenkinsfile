@@ -55,7 +55,7 @@ podTemplate(
             container('kubectl'){
                 sh '''
                 kubectl patch deployment hello-nginx -p \
-                  "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+                  '{"spec":{"template":{"metadata":{"labels":{"date":"`date +'%s'`"}}}}}'
                 '''
             }
         }
