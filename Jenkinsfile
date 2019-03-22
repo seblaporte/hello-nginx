@@ -54,16 +54,13 @@ podTemplate(
         }
         
         node(label) {
-            stage('Build with Kaniko') {
-              git 'https://github.com/seblaporte/hello-nginx.git'
-              container(name: 'kaniko', shell: '/busybox/sh') {
-                withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
-                  sh '''#!/busybox/sh
-                  /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=registry.demo-pic.techlead-top.ovh/myimage
-                  '''
-                }
-              }
-            }
+            container(name: 'kaniko', shell: '/busybox/sh') {
+               withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
+                 sh '''#!/busybox/sh
+                 /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=registry.demo-pic.techlead-top.ovh/myimage
+                 '''
+               }
+             }
           }
 
         stage('Deploy with Kubernetes'){
