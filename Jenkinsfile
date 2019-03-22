@@ -9,13 +9,10 @@ podTemplate(
                 args: '${computer.jnlpmac} ${computer.name}'
             ),
         containerTemplate(
-                name: 'docker',
-                image: 'docker:stable',
-                command:'cat',
+                name: 'kaniko',
+                image: 'gcr.io/kaniko-project/executor:latest',
+                command:'/busybox/cat',
                 ttyEnabled:true,
-                envVars: [
-                    envVar(key: 'DOCKER_CONFIG', value: '/root/.docker')
-                ]
             ),
         containerTemplate(
                 name: 'kubectl',
@@ -55,15 +52,14 @@ podTemplate(
             }
         }
         
-        stage('Build Docker image'){
-            container('docker'){
-                sh 'docker build -t `cat /share/imageName` .'
-            }
-        }
-        
-        stage('Push to private registry'){
-            container('docker'){
-                sh 'docker push `cat /share/imageName`'
+        stage('Build Docker image and push to private registry'){
+            container(name: 'kaniko', shell: '/busybox/sh') {
+                withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
+                sh '''
+                #!/busybox/sh
+                /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=registry.demo-pic.techlead-top.ovh/myorg/myimage
+                '''
+                }
             }
         }
 
