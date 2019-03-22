@@ -1,8 +1,6 @@
 def label = "jenkins-worker-${UUID.randomUUID().toString()}"
 
-podTemplate(
-    label: label,
-    yaml: """
+podTemplate(label: label, yaml: """
 kind: Pod
 metadata:
   name: jnlp-kaniko-kubectl
