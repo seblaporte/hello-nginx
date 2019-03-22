@@ -1,45 +1,6 @@
 def label = "jenkins-worker-${UUID.randomUUID().toString()}"
 
-podTemplate(name: 'jenkins-slave', label: label, yaml: """
-kind: Pod
-metadata:
-  name: jnlp-kaniko-kubectl
-spec:
-  containers:
-  - name: kaniko
-    image: gcr.io/kaniko-project/executor:debug
-    imagePullPolicy: Always
-    command:
-    - /busybox/cat
-    tty: true
-    volumeMounts:
-      - name: docker-config
-        mountPath: /kaniko/.docker/
-
-  - name: jnlp
-    image: jenkins/jnlp-slave:3.10-1
-    imagePullPolicy: Always
-
-  - name: kubectl
-    image: dtzar/helm-kubectl:2.13.0
-    imagePullPolicy: Always
-    tty: true
-    volumeMounts:
-      - name: kube-config
-        mountPath: /root/.kube
-    env:
-    - name: KUBECONFIG
-      value: "/root/.kube/config"
-
-  volumes:
-  - name: docker-config
-    secret:
-      secretName: docker-config
-  - name: kube-config
-    secret:
-      secretName: kube-config
-"""
-)
+podTemplate(name: 'jenkins-slave', label: label, yaml: readFile("k8s-jenkins-pod.yaml"))
 {
     node(label){
 
