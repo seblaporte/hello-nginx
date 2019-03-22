@@ -35,7 +35,7 @@ podTemplate(
 {
     node(label){
 
-        stage('Git clone'){
+        stage('Get sources'){
            container('jnlp'){
                 git branch: 'master', url: 'https://github.com/seblaporte/hello-nginx.git'
            }
@@ -51,9 +51,12 @@ podTemplate(
              }
           }
 
-        stage('Deploy with Kubernetes'){
+        stage('Deploy'){
             container('kubectl'){
-                sh 'kubectl apply -n demo-pic -f k8s-deployment.yaml'
+                sh '''
+                kubectl patch deployment hello-nginx -p \
+                  "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+                '''
             }
         }
             
