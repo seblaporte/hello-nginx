@@ -11,7 +11,7 @@ podTemplate(
         containerTemplate(
                 name: 'kaniko',
                 image: 'gcr.io/kaniko-project/executor:debug',
-                command:'/busybox/catt',
+                command:'/busybox/cat',
                 ttyEnabled:true,
             ),
         containerTemplate(
