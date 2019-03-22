@@ -26,7 +26,7 @@ podTemplate(
     ],
     volumes: [
         hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-        secretVolume(secretName: 'docker-config', mountPath: '/root/.docker'),
+        secretVolume(secretName: 'docker-config', mountPath: '/root/.docker/'),
         secretVolume(secretName: 'kube-config', mountPath: '/root/.kube'),
         persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-slave-share'),
         configMapVolume(mountPath: '/config', configMapName: 'job-jenkins-config')
@@ -53,15 +53,18 @@ podTemplate(
             }
         }
         
-        stage('Build Docker image and push to private registry'){
-            container(name: 'kaniko', shell: '/busybox/sh') {
+        node(label) {
+            stage('Build with Kaniko') {
+              git 'https://github.com/seblaporte/hello-nginx.git'
+              container(name: 'kaniko', shell: '/busybox/sh') {
                 withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
-                sh '''
-                /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=registry.demo-pic.techlead-top.ovh/myorg/myimage
-                '''
+                  sh '''#!/busybox/sh
+                  /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=registry.demo-pic.techlead-top.ovh/myimage
+                  '''
                 }
+              }
             }
-        }
+          }
 
         stage('Deploy with Kubernetes'){
             container('kubectl'){
