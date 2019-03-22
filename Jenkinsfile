@@ -1,6 +1,6 @@
 def label = "jenkins-worker-${UUID.randomUUID().toString()}"
 
-podTemplate(label: label, yaml: """
+podTemplate(name: 'jenkins-slave', label: label, yaml: """
 kind: Pod
 metadata:
   name: jnlp-kaniko-kubectl
@@ -19,7 +19,6 @@ spec:
   - name: jnlp
     image: jenkins/jnlp-slave:3.10-1
     imagePullPolicy: Always
-    args: ["${computer.jnlpmac} ${computer.name}"]
 
   - name: kubectl
     image: dtzar/helm-kubectl:2.13.0
