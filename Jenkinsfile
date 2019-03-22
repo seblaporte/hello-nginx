@@ -51,8 +51,8 @@ podTemplate(
                 '''
             }
         }
-        
-        node(label) {
+
+        stage('Build image and push to registry'){
             container(name: 'kaniko', shell: '/busybox/sh') {
                withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
                  sh '''#!/busybox/sh
