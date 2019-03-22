@@ -25,8 +25,7 @@ podTemplate(
             )
     ],
     volumes: [
-        hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
-        secretVolume(secretName: 'docker-config', mountPath: '/root/.docker/'),
+        secretVolume(secretName: 'docker-config', mountPath: '/kaniko/.docker/'),
         secretVolume(secretName: 'kube-config', mountPath: '/root/.kube'),
         persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-slave-share'),
         configMapVolume(mountPath: '/config', configMapName: 'job-jenkins-config')
