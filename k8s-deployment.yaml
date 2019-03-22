@@ -1,5 +1,5 @@
+apiVersion: apps/v1
 kind: Deployment
-apiVersion: extensions/v1beta1
 metadata:
   labels:
     app: hello-nginx
@@ -7,7 +7,7 @@ metadata:
   namespace: demo-pic
 spec:
   replicas: 1
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: 3
   selector:
     matchLabels:
       app: hello-nginx
@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: hello-nginx
-        image: IMAGE
+        image: hello-nginx:latest
         imagePullPolicy: Always
         ports:
           - name: web
