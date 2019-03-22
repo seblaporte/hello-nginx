@@ -1,4 +1,4 @@
-def label = "demo-pic-worker-${UUID.randomUUID().toString()}"
+def label = "jenkins-worker-${UUID.randomUUID().toString()}"
 
 podTemplate(
     label: label,
@@ -28,8 +28,8 @@ podTemplate(
         hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
         secretVolume(secretName: 'docker-config', mountPath: '/root/.docker'),
         secretVolume(secretName: 'kube-config', mountPath: '/root/.kube'),
-        persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-hello-nginx-share'),
-        configMapVolume(mountPath: '/config', configMapName: 'hello-nginx-job-config')
+        persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-slave-share'),
+        configMapVolume(mountPath: '/config', configMapName: 'job-jenkins-config')
     ]
 )
 
@@ -46,7 +46,8 @@ podTemplate(
             container('jnlp'){
                 sh  '''
                 git rev-parse --short HEAD > /share/buildVersion
-                echo "`cat /config/registryHost`/`cat /config/applicationName`:`cat /share/buildVersion`" > /share/imageName
+                git config --local remote.origin.url|sed -n 's#.*/\\([^.]*\\)\\.git#\\1#p' > /share/applicationName
+                echo "`cat /config/registryHost`/`cat /share/applicationName`:`cat /share/buildVersion`" > /share/imageName
                 sed -ie s@IMAGE@`cat /share/imageName`@g k8s-deployment.yaml
                 '''
             }
