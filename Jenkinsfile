@@ -13,6 +13,9 @@ podTemplate(
                 image: 'gcr.io/kaniko-project/executor:debug',
                 command:'/busybox/cat',
                 ttyEnabled:true,
+                envVars: [
+                    envVar(key: 'PATH+EXTRA', value: '/busybox:/kaniko')
+                ]
             ),
         containerTemplate(
                 name: 'kubectl',
@@ -43,11 +46,9 @@ podTemplate(
 
         stage('Build image and push to registry'){
             container(name: 'kaniko', shell: '/busybox/sh') {
-               withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
-                 sh '''#!/busybox/sh
-                 /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=registry.demo-pic.techlead-top.ovh/hello-nginx:latest
-                 '''
-               }
+               sh '''#!/busybox/sh
+               /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=registry.demo-pic.techlead-top.ovh/hello-nginx:latest
+               '''
              }
           }
 
