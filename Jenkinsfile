@@ -2,36 +2,47 @@ def label = "jenkins-worker-${UUID.randomUUID().toString()}"
 
 podTemplate(
     label: label,
-    containers: [
-        containerTemplate(
-                name: 'jnlp',
-                image: 'jenkins/jnlp-slave:3.10-1',
-                args: '${computer.jnlpmac} ${computer.name}'
-            ),
-        containerTemplate(
-                name: 'kaniko',
-                image: 'gcr.io/kaniko-project/executor:debug',
-                command:'/busybox/cat',
-                ttyEnabled:true
-            ),
-        containerTemplate(
-                name: 'kubectl',
-                image: 'dtzar/helm-kubectl:2.13.0',
-                command:'cat',
-                ttyEnabled:true,
-                envVars: [
-                    envVar(key: 'KUBECONFIG', value: '/root/.kube/config')
-                ]
-            )
-    ],
-    volumes: [
-        secretVolume(secretName: 'docker-config', mountPath: '/kaniko/.docker/'),
-        secretVolume(secretName: 'kube-config', mountPath: '/root/.kube'),
-        persistentVolumeClaim(mountPath: '/share', claimName: 'jenkins-slave-share'),
-        configMapVolume(mountPath: '/config', configMapName: 'job-jenkins-config')
-    ]
-)
+    yaml: """
+kind: Pod
+metadata:
+  name: jnlp-kaniko-kubectl
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: Always
+    command:
+    - /busybox/cat
+    tty: true
+    volumeMounts:
+      - name: docker-config
+        mountPath: /kaniko/.docker/
 
+  - name: jnlp
+    image: jenkins/jnlp-slave:3.10-1
+    imagePullPolicy: Always
+    args: ["${computer.jnlpmac} ${computer.name}"]
+
+  - name: kubectl
+    image: dtzar/helm-kubectl:2.13.0
+    imagePullPolicy: Always
+    tty: true
+    volumeMounts:
+      - name: kube-config
+        mountPath: /root/.kube
+    env:
+    - name: KUBECONFIG
+      value: "/root/.kube/config"
+
+  volumes:
+  - name: docker-config
+    secret:
+      secretName: docker-config
+  - name: kube-config
+    secret:
+      secretName: kube-config
+"""
+)
 {
     node(label){
 
