@@ -55,8 +55,8 @@ spec:
                  /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=registry.demo-pic.techlead-top.ovh/hello-nginx:latest
                  '''
                }
-             }
-          }
+            }
+         }
 
         stage('Deploy'){
             container('kubectl'){
