@@ -31,6 +31,36 @@ spec:
     - name: KUBECONFIG
       value: "/root/.kube/config"
 
+  - name: klar-scanner
+      image: registry.demo-pic.techlead-top.ovh/klar
+      imagePullPolicy: Always
+      tty: true
+      command:
+      - cat
+      env:
+      - name: CLAIR_ADDR
+        valueFrom:
+          secretKeyRef:
+            name: clair-config
+            key: clairAddress
+      - name: DOCKER_USER
+        valueFrom:
+          secretKeyRef:
+            name: clair-config
+            key: dockerUser
+      - name: DOCKER_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: clair-config
+            key: dockerPassword
+      - name: CLAIR_OUTPUT
+        value: High
+      - name: CLAIR_THRESHOLD
+        value: 10
+
+  imagePullSecrets:
+  - name: docker-registry-config
+
   volumes:
   - name: docker-config
     secret:
@@ -64,6 +94,12 @@ spec:
                 kubectl patch deployment hello-nginx -p \
                   '{"spec":{"template":{"metadata":{"labels":{"date":"'`date +'%s'`'"}}}}}'
                 '''
+            }
+        }
+
+        stage('Clair analysis'){
+            container('klar-scanner'){
+                sh '/klar registry.demo-pic.techlead-top.ovh/hello-nginx:latest'
             }
         }
 
