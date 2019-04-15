@@ -32,31 +32,31 @@ spec:
       value: "/root/.kube/config"
 
   - name: klar-scanner
-      image: registry.demo-pic.techlead-top.ovh/klar
-      imagePullPolicy: Always
-      tty: true
-      command:
-      - cat
-      env:
-      - name: CLAIR_ADDR
-        valueFrom:
-          secretKeyRef:
-            name: clair-config
-            key: clairAddress
-      - name: DOCKER_USER
-        valueFrom:
-          secretKeyRef:
-            name: clair-config
-            key: dockerUser
-      - name: DOCKER_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: clair-config
-            key: dockerPassword
-      - name: CLAIR_OUTPUT
-        value: High
-      - name: CLAIR_THRESHOLD
-        value: 10
+    image: registry.demo-pic.techlead-top.ovh/klar
+    imagePullPolicy: Always
+    tty: true
+    command:
+    - cat
+    env:
+    - name: CLAIR_ADDR
+      valueFrom:
+        secretKeyRef:
+          name: clair-config
+          key: clairAddress
+    - name: DOCKER_USER
+      valueFrom:
+        secretKeyRef:
+          name: clair-config
+          key: dockerUser
+    - name: DOCKER_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: clair-config
+          key: dockerPassword
+    - name: CLAIR_OUTPUT
+      value: High
+    - name: CLAIR_THRESHOLD
+      value: 10
 
   imagePullSecrets:
   - name: docker-registry-config
