@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: hello-nginx-BRANCH_NAME
+  name: hello-nginx-BRANCH_NAME
+  namespace: demo-pic
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: hello-nginx-BRANCH_NAME
+  template:
+    metadata:
+      labels:
+        app: hello-nginx-BRANCH_NAME
+    spec:
+      containers:
+        - name: hello-nginx
+          image: registry.demo-pic.techlead-top.ovh/hello-nginx:BRANCH_NAME
+          imagePullPolicy: Always
+          ports:
+            - name: web
+              containerPort: 80
+      imagePullSecrets:
+        - name: docker-registry-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-nginx-BRANCH_NAME
+  namespace: demo-pic
+spec:
+  selector:
+    app: hello-nginx-BRANCH_NAME
+  ports:
+    - name: web
+      port: 80
+      targetPort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: hello-nginx-BRANCH_NAME
+  namespace: demo-pic
+spec:
+  rules:
+    - host: hello-nginx.BRANCH_NAME.demo-pic.techlead-top.ovh
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: hello-nginx-BRANCH_NAME
+              servicePort: web

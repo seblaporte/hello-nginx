@@ -74,7 +74,7 @@ spec:
 
         stage('Get sources'){
            container('jnlp'){
-                git branch: 'master', url: 'https://github.com/seblaporte/hello-nginx.git'
+                git branch: BRANCH_NAME, url: 'https://github.com/seblaporte/hello-nginx.git'
            }
         }
 
@@ -82,7 +82,8 @@ spec:
             container(name: 'kaniko', shell: '/busybox/sh') {
                withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
                  sh '''#!/busybox/sh
-                 /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true --destination=registry.demo-pic.techlead-top.ovh/hello-nginx:latest
+                 /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true \
+                     --destination=registry.demo-pic.techlead-top.ovh/hello-nginx:$BRANCH_NAME
                  '''
                }
             }
@@ -91,8 +92,9 @@ spec:
         stage('Deploy'){
             container('kubectl'){
                 sh '''
-                kubectl patch deployment hello-nginx -p \
-                  '{"spec":{"template":{"metadata":{"labels":{"date":"'`date +'%s'`'"}}}}}'
+                sed "s/BRANCH_NAME/$BRANCH_NAME/g" k8s.yaml | kubectl apply -f -
+                kubectl patch deployment hello-nginx-$BRANCH_NAME -p \
+                    '{"spec":{"template":{"metadata":{"labels":{"date":"'`date +'%s'`'"}}}}}'
                 '''
             }
         }
