@@ -101,7 +101,7 @@ spec:
 
         stage('Clair analysis'){
             container('klar-scanner'){
-                sh '/klar registry.demo-pic.techlead-top.ovh/hello-nginx:latest'
+                sh '/klar registry.demo-pic.techlead-top.ovh/hello-nginx:$BRANCH_NAME'
             }
         }
 
