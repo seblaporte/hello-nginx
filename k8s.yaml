@@ -6,7 +6,7 @@ metadata:
   name: hello-nginx-BRANCH_NAME
   namespace: demo-pic
 spec:
-  replicas: 2
+  replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
