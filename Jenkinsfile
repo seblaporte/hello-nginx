@@ -38,9 +38,9 @@ spec:
   - name: docker-config
     secret:
       secretName: docker-config
-  - name: kube-config-demo
+  - name: kube-config
     secret:
-      secretName: kube-config
+      secretName: kube-config-demo
 """)
 {
     node(label){
