@@ -31,33 +31,6 @@ spec:
     - name: KUBECONFIG
       value: "/root/.kube/config"
 
-  - name: klar-scanner
-    image: registry.demo-pic.techlead-top.ovh/klar
-    imagePullPolicy: Always
-    tty: true
-    command:
-    - cat
-    env:
-    - name: CLAIR_ADDR
-      valueFrom:
-        secretKeyRef:
-          name: clair-config
-          key: clairAddress
-    - name: DOCKER_USER
-      valueFrom:
-        secretKeyRef:
-          name: clair-config
-          key: dockerUser
-    - name: DOCKER_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: clair-config
-          key: dockerPassword
-    - name: CLAIR_OUTPUT
-      value: High
-    - name: CLAIR_THRESHOLD
-      value: 10
-
   imagePullSecrets:
   - name: docker-registry-config
 
@@ -65,7 +38,7 @@ spec:
   - name: docker-config
     secret:
       secretName: docker-config
-  - name: kube-config
+  - name: kube-config-demo
     secret:
       secretName: kube-config
 """)
@@ -83,7 +56,7 @@ spec:
                withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
                  sh '''#!/busybox/sh
                  /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true \
-                     --destination=registry.demo-pic.techlead-top.ovh/hello-nginx:$BRANCH_NAME
+                     --destination=cf1n92at.gra5.container-registry.ovh.net/hello-nginx:$BRANCH_NAME
                  '''
                }
             }
@@ -92,16 +65,10 @@ spec:
         stage('Deploy'){
             container('kubectl'){
                 sh '''
-                sed "s/BRANCH_NAME/$BRANCH_NAME/g" k8s.yaml | kubectl apply -f -
+                sed "s/BRANCH_NAME/$BRANCH_NAME/g" k8s.yaml | kubectl apply -n demo -f -
                 kubectl patch deployment hello-nginx-$BRANCH_NAME -p \
                     '{"spec":{"template":{"metadata":{"labels":{"date":"'`date +'%s'`'"}}}}}'
                 '''
-            }
-        }
-
-        stage('Clair analysis'){
-            container('klar-scanner'){
-                sh '/klar registry.demo-pic.techlead-top.ovh/hello-nginx:$BRANCH_NAME'
             }
         }
 

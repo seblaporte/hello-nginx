@@ -4,7 +4,6 @@ metadata:
   labels:
     app: hello-nginx-BRANCH_NAME
   name: hello-nginx-BRANCH_NAME
-  namespace: demo-pic
 spec:
   replicas: 1
   revisionHistoryLimit: 3
@@ -18,19 +17,26 @@ spec:
     spec:
       containers:
         - name: hello-nginx
-          image: registry.demo-pic.techlead-top.ovh/hello-nginx:BRANCH_NAME
+          image: cf1n92at.gra5.container-registry.ovh.net/hello-nginx:BRANCH_NAME
           imagePullPolicy: Always
           ports:
             - name: web
               containerPort: 80
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
       imagePullSecrets:
         - name: docker-registry-config
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: hello-nginx-BRANCH_NAME
-  namespace: demo-pic
 spec:
   selector:
     app: hello-nginx-BRANCH_NAME
@@ -38,18 +44,18 @@ spec:
     - name: web
       port: 80
       targetPort: 80
+
 ---
-apiVersion: extensions/v1beta1
-kind: Ingress
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
 metadata:
-  name: hello-nginx-BRANCH_NAME
-  namespace: demo-pic
+  name: hello-nginx-BRANCH_NAME-web-ui-http
 spec:
-  rules:
-    - host: hello-nginx.BRANCH_NAME.demo-pic.techlead-top.ovh
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: hello-nginx-BRANCH_NAME
-              servicePort: web
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`hello-nginx.BRANCH_NAME.demo.apside-top.fr`)
+      kind: Rule
+      services:
+        - name: hello-nginx-BRANCH_NAME
+          port: 80
