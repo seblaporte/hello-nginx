@@ -45,12 +45,6 @@ spec:
 {
     node(label){
 
-        stage('Get sources'){
-           container('jnlp'){
-                git branch: BRANCH_NAME, url: 'https://github.com/seblaporte/hello-nginx.git'
-           }
-        }
-
         stage('Build image and push to registry'){
             container(name: 'kaniko', shell: '/busybox/sh') {
                withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
