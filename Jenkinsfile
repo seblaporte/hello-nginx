@@ -16,10 +16,6 @@ spec:
       - name: docker-config
         mountPath: /kaniko/.docker/
 
-  - name: jnlp
-    image: jenkins/jnlp-slave:3.10-1
-    imagePullPolicy: Always
-
   - name: kubectl
     image: dtzar/helm-kubectl:2.13.0
     imagePullPolicy: Always
