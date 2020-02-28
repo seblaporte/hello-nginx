@@ -62,7 +62,7 @@ spec:
             container('kubectl'){
                 sh '''
                 sed "s/BRANCH_NAME/$BRANCH_NAME/g" k8s.yaml | kubectl apply -n demo -f -
-                kubectl patch deployment hello-nginx-$BRANCH_NAME -p \
+                kubectl patch deployment hello-nginx-$BRANCH_NAME -n demo -p \
                     '{"spec":{"template":{"metadata":{"labels":{"date":"'`date +'%s'`'"}}}}}'
                 '''
             }
