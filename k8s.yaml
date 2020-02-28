@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: hello-nginx
-          image: cf1n92at.gra5.container-registry.ovh.net/hello-nginx:BRANCH_NAME
+          image: cf1n92at.gra5.container-registry.ovh.net/private/hello-nginx:BRANCH_NAME
           imagePullPolicy: Always
           ports:
             - name: web

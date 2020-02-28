@@ -52,7 +52,7 @@ spec:
                withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
                  sh '''#!/busybox/sh
                  /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cache=true \
-                     --destination=cf1n92at.gra5.container-registry.ovh.net/hello-nginx:$BRANCH_NAME
+                     --destination=cf1n92at.gra5.container-registry.ovh.net/private/hello-nginx:$BRANCH_NAME
                  '''
                }
             }
