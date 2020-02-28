@@ -43,7 +43,7 @@ spec:
 
         stage('Get sources'){
            container('jnlp'){
-                git branch: BRANCH_NAME, url: 'https://github.com/seblaporte/hello-nginx.git'
+                git branch: BRANCH_NAME, url: 'https://gitea.ci.apside-top.fr/demonstration/hello-nginx.git'
            }
         }
 
